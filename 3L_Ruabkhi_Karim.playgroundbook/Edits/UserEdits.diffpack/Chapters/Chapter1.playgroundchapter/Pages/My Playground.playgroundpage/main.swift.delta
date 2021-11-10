@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Diff</key>
+	<array>
+		<dict>
+			<key>ModifiedContent</key>
+			<string>enum actionsWithCar {  // Перечисление с возможными действиями с авто (Задание 3)
+    enum engine {
+        case on
+        case off
+    }
+    enum moveWindows {
+        case open
+        case close
+    }
+    enum trunk {
+        case load(amount: Double)
+        case unload(amount: Double)
+    }
+    enum trailer {
+        case load(amount: Double)
+        case unload(amount: Double)
+    }
+}
+
+enum Currency: String { // Вспомогательное перечисление для структцры Price
+    case USD = "USD"
+    case RUB = "RUB"
+    case initial = ""
+}
+
+struct Price { // Структура для описания цены
+    public var value: Double
+    public var name: String
+    
+    init (amount value: Double = 0, currency name: Currency = .USD) {
+        self.value = value
+        self.name = name.rawValue
+    }
+    init () {
+        self.value = 10
+        self.name = "USD"
+    }
+    
+    func getPrice() -&gt; String {
+        return "price: \(self.value) \(self.name)"
+    }
+}
+
+struct SportCar {  // Описание структуры SportCar (Задание 1 и Задание 2)
+    private var brand: String  // марка авто
+    private var yearOfRelease: Int // год выпуска
+    private var trunkVolume: Double  // объем багажника
+    private var isEngineRunning: Bool  // включен ли двигатель
+    private var isWindowsOpen: Bool // открыты ли окна 
+    private var currentTrunkVolume:  Double  // заполненный объем багажника
+    private var price: Price
+    private var mileage: Double
+    private var horsepower: Int
+    private var maxSpeed: Double
+    private var didDiscount: Bool = false
+    
+    init (brand: String = " ", year: Int, trunkVolume: Double, isEngineRunning: Bool = false, isWindowsOpen: Bool = false, currentTrunkVolume: Double, price: Price = Price(), mileage: Double = 0, horsepower: Int = 0, maxSpeed: Double = 0) {
+        self.brand = brand
+        self.yearOfRelease = year
+        self.trunkVolume = trunkVolume
+        self.isEngineRunning = isEngineRunning
+        self.isWindowsOpen = isWindowsOpen
+        self.currentTrunkVolume = currentTrunkVolume
+        self.price = price
+        self.mileage = mileage
+        self.horsepower = horsepower
+        self.maxSpeed = maxSpeed 
+    }
+    
+    private mutating func setPrice(_ newPrice: Price) {
+        self.price = newPrice
+    }
+    
+    func getBrand() -&gt; String {
+        return self.brand
+    }
+    
+    func getYearOfRelease() -&gt; String {
+        return self.brand
+    }
+    
+    func getTrunkVolume() -&gt; Double {
+        return self.trunkVolume
+    }
+    
+    func getCurrentTrunkVolume() -&gt; Double {
+        return self.currentTrunkVolume
+    }
+    
+    func getPrice() -&gt; String {
+        let result: String = price.getPrice() 
+        return result
+    }
+    
+    func getMileage() -&gt; Double {
+        return self.mileage
+    }
+    
+    func getHorsepower() -&gt; Int {
+        return self.horsepower
+    }
+    
+    func getMaxSpeed() -&gt; Double {
+        return self.maxSpeed
+    }
+    
+    func isEngineWork() -&gt; Bool {
+        return self.isEngineRunning
+    }
+    
+    func isWindowsClose() -&gt; Bool {
+        return !self.isWindowsOpen
+    }
+    
+    mutating func actionWithEngine(action: actionsWithCar.engine) {  // (Задание 4)
+        switch action {
+        case .on:
+            self.isEngineRunning = true 
+        case .off:
+            self.isEngineRunning = false
+        default:
+            print("Error: action with engine")
+        }
+    }
+    
+    mutating func actionWithWindiws(action: actionsWithCar.moveWindows) {   // (Задание 4)
+        switch action {
+        case .open:
+            self.isWindowsOpen = true 
+        case .close:
+            self.isWindowsOpen = false
+        default:
+            print("Error: action with windows")
+        }
+    }
+    
+    mutating func actionWithTrunk(action: actionsWithCar.trunk) {  // (Задание 4)
+        switch action {
+        case .load(var param) where param &lt;= (self.trunkVolume - self.currentTrunkVolume):
+            self.currentTrunkVolume += param
+        case .unload(var param) where (param &gt;= 0) &amp;&amp; (param &lt; self.currentTrunkVolume):
+            self.currentTrunkVolume -= param
+        default:
+            print("Error: action with trunk")
+        }
+    }
+    
+    mutating func doDiscount(percent: Double) -&gt; Bool {
+        var result: Bool = false
+        if ( (percent &lt;= 10 &amp;&amp; percent &gt;= 0) &amp;&amp; !self.didDiscount) { 
+            var newCost = self.price.value * (1 - percent/100)
+            var selfCurrency: Currency = .initial
+            switch self.price.name {
+            case "RUB":
+                selfCurrency = .RUB
+            case "USD":
+                selfCurrency = .USD
+            default:
+                print("Error")
+            }
+            
+            self.didDiscount = true
+            setPrice(Price(amount: newCost, currency: selfCurrency))
+            print("price have changed")
+        } else if (didDiscount) {
+            print("the discount has already been made")
+        } else {
+            print("price haven't changed")
+        }
+        return result
+    }
+    
+}
+
+struct TrunkCar {  // Описание структуры TrunkCar (Задание 1 и Задание 2)
+    private var brand: String  // марка авто
+    private var yearOfRelease: Int // год выпуска
+    private var trailerVolume: Double  // объем кузова
+    private var isEngineRunning: Bool  // включен ли двигатель
+    private var isWindowsOpen: Bool // открыты ли окна 
+    private var currentTrailerVolume:  Double  // заполненный объем кузова
+    private var price: Price
+    private var mileage: Double
+    private var horsepower: Int
+    private var maxSpeed: Double
+    private var didDiscount: Bool = false
+    
+    init (brand: String = " ", year: Int, trailerVolume: Double, isEngineRunning: Bool = false, isWindowsOpen: Bool = false, currentTrailerVolume: Double, price: Price = Price(), mileage: Double = 0, horsepower: Int = 0, maxSpeed: Double = 300) {
+        self.brand = brand
+        self.yearOfRelease = year
+        self.trailerVolume = trailerVolume
+        self.isEngineRunning = isEngineRunning
+        self.isWindowsOpen = isWindowsOpen
+        self.currentTrailerVolume = currentTrailerVolume
+        self.price = price
+        self.mileage = mileage
+        self.horsepower = horsepower
+        self.maxSpeed = maxSpeed 
+    }
+    
+    private mutating func setPrice(_ newPrice: Price) {
+        self.price = newPrice
+    }
+    
+    func getBrand() -&gt; String {
+        return self.brand
+    }
+    
+    func getYearOfRelease() -&gt; String {
+        return self.brand
+    }
+    
+    func getTrailerVolume() -&gt; Double {
+        return self.trailerVolume
+    }
+    
+    func getCurrentTrailerVolume() -&gt; Double {
+        return self.currentTrailerVolume
+    }
+    
+    func getPrice() -&gt; String {
+        let result: String = price.getPrice() 
+        return result
+    }
+    
+    func getMileage() -&gt; Double {
+        return self.mileage
+    }
+    
+    func getHorsepower() -&gt; Int {
+        return self.horsepower
+    }
+    
+    func getMaxSpeed() -&gt; Double {
+        return self.maxSpeed
+    }
+    
+    func isEngineWork() -&gt; Bool {
+        return self.isEngineRunning
+    }
+    
+    func isWindowsClose() -&gt; Bool {
+        return !self.isWindowsOpen
+    }
+    
+    
+    
+    mutating func actionWithEngine(action: actionsWithCar.engine) {  // (Задание 4)
+        switch action {
+        case .on:
+            self.isEngineRunning = true 
+        case .off:
+            self.isEngineRunning = false
+        default:
+            print("Error: action with engine")
+        }
+    }
+    
+    mutating func actionWithWindiws(action: actionsWithCar.moveWindows) {  // (Задание 4)
+        switch action {
+        case .open:
+            self.isWindowsOpen = true 
+        case .close:
+            self.isWindowsOpen = false
+        default:
+            print("Error: action with windows")
+        }
+    }
+    
+    mutating func actionWithTrailer(action: actionsWithCar.trailer) {  // (Задание 4)
+        switch action {
+        case .load(var param) where param &lt;= (self.trailerVolume - self.currentTrailerVolume):
+            self.currentTrailerVolume += param
+        case .unload(var param) where (param &gt;= 0) &amp;&amp; (param &lt; self.currentTrailerVolume):
+            self.currentTrailerVolume -= param
+        default:
+            print("Error: action with trailer")
+        }
+    }
+    
+    mutating func doDiscount(percent: Double) -&gt; Bool {
+        var result: Bool = false
+        if ( (percent &lt;= 10 &amp;&amp; percent &gt;= 0) &amp;&amp; !self.didDiscount) { 
+            var newCost = self.price.value * (1 - percent/100)
+            var selfCurrency: Currency = .initial
+            switch self.price.name {
+            case "RUB":
+                selfCurrency = .RUB
+            case "USD":
+                selfCurrency = .USD
+            default:
+                print("Error")
+            }
+            
+            self.didDiscount = true
+            setPrice(Price(amount: newCost, currency: selfCurrency))
+            print("price have changed")
+        } else if (didDiscount) {
+            print("the discount has already been made")
+        } else {
+            print("price haven't changed")
+        }
+        return result
+    }
+}
+
+//Задание 5 и Задание 6:
+var volvoSportCar: SportCar = SportCar(brand: "Volvo", year: 2018, trunkVolume: 575, isEngineRunning: false, isWindowsOpen: false, currentTrunkVolume: 0, price: Price(amount: 25000, currency: .USD), mileage: 3000, horsepower: 190, maxSpeed: 240)
+print("\nVolvoSportCar: ")
+volvoSportCar.actionWithEngine(action: .on)
+volvoSportCar.doDiscount(percent: 0.5)
+print(volvoSportCar.getPrice())
+volvoSportCar.actionWithTrunk(action: .load(amount: 300))
+volvoSportCar.actionWithTrunk(action: .unload(amount: 173))
+print("\t\(volvoSportCar)")
+
+
+var lexusSportCar: SportCar = SportCar(brand: "Lexus", year: 2012, trunkVolume: 200, isEngineRunning: false, isWindowsOpen: false, currentTrunkVolume: 0, price: Price(amount: 200000, currency: .USD), mileage: 40000, horsepower: 560, maxSpeed: 325)
+print("\nLexusSportCar: ")
+lexusSportCar.doDiscount(percent: 5)
+lexusSportCar.actionWithWindiws(action: .open)
+lexusSportCar.actionWithTrunk(action: .load(amount: 200))
+lexusSportCar.actionWithTrunk(action: .unload(amount: 159))
+print("horsepower: \(lexusSportCar.getHorsepower())")
+print("\t\(lexusSportCar)")
+
+
+var fordTrunkCar: TrunkCar = TrunkCar(brand: "Ford", year: 2019, trailerVolume: 20000, isEngineRunning: false, isWindowsOpen: false, currentTrailerVolume: 0, price: Price(amount: 250000, currency: .USD), mileage: 10000, horsepower: 500, maxSpeed: 210)
+print("\nFordTrunkCar: ")
+fordTrunkCar.actionWithTrailer(action: .load(amount: 23540)) // ошибка: значение превышает вместимость прицепа
+fordTrunkCar.actionWithTrailer(action: .unload(amount: 1280)) // ошибка: значение превышает текущее количество едениц объема в трейлере
+fordTrunkCar.actionWithTrailer(action: .load(amount: 13750)) // все окей
+print("Current trailer volume: \(fordTrunkCar.getCurrentTrailerVolume())")
+fordTrunkCar.doDiscount(percent: 8)
+print("\t\(fordTrunkCar)")
+
+
+var mercedesBenzTrunkCar: TrunkCar = TrunkCar(brand: "MercedesBenz", year: 2020, trailerVolume: 15000, isEngineRunning: false, isWindowsOpen: false, currentTrailerVolume: 0, price: Price(amount: 270000, currency: .USD), mileage: 10000, horsepower: 360, maxSpeed: 180)
+print("\nMercedesBenzTrunkCar: ")
+mercedesBenzTrunkCar.doDiscount(percent: 13) // ошибка: слишком большая скидка (цена не изменится)
+mercedesBenzTrunkCar.doDiscount(percent: 1)
+mercedesBenzTrunkCar.doDiscount(percent: 5) // ошибка: цена уже была изменена  
+mercedesBenzTrunkCar.actionWithWindiws(action: .open)
+print("Is windows closed? \(mercedesBenzTrunkCar.isWindowsClose())")  // false: окна не закрыты
+mercedesBenzTrunkCar.actionWithEngine(action: .off)
+mercedesBenzTrunkCar.actionWithTrailer(action: .load(amount: 12000))
+print("\t\(mercedesBenzTrunkCar)")
+
+</string>
+			<key>ModifiedRange</key>
+			<string>{0, 11835}</string>
+			<key>OriginalContent</key>
+			<string></string>
+			<key>OriginalRange</key>
+			<string>{0, 0}</string>
+		</dict>
+	</array>
+	<key>File</key>
+	<string>Chapters/Chapter1.playgroundchapter/Pages/My Playground.playgroundpage/main.swift</string>
+</dict>
+</plist>
